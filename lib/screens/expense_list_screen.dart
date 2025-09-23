@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/expense.dart';
+import '../widgets/expense_card.dart';
 
 class ExpenseListScreen extends StatelessWidget {
   const ExpenseListScreen({super.key});
@@ -75,14 +76,14 @@ class ExpenseListScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Expenses'),
+        title: const Text('Expenses'),
         backgroundColor: Colors.blue,
       ),
       body: Column(
         children: [
           Container(
             width: double.infinity,
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.blue.shade50,
               border: Border(
@@ -100,7 +101,7 @@ class ExpenseListScreen extends StatelessWidget {
                 ),
                 Text(
                   _calculateTotal(expenses),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.blue,
@@ -111,60 +112,10 @@ class ExpenseListScreen extends StatelessWidget {
           ),
           Expanded(
             child: ListView.builder(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               itemCount: expenses.length,
               itemBuilder: (context, index) {
-                final expense = expenses[index];
-                return Card(
-                  margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  elevation: 2,
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: _getCategoryColor(expense.category),
-                      child: Icon(
-                        _getCategoryIcon(expense.category),
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                    title: Text(
-                      expense.title,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          expense.category,
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 12,
-                          ),
-                        ),
-                        Text(
-                          expense.formattedDate,
-                          style: TextStyle(
-                            color: Colors.grey[500],
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
-                    ),
-                    trailing: Text(
-                      expense.formattedAmount,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Colors.red[600],
-                      ),
-                    ),
-                    onTap: () {
-                      _showExpenseDetails(context, expense);
-                    },
-                  ),
-                );
+                return ExpenseCard(expense: expenses[index]);
               },
             ),
           ),
@@ -173,11 +124,11 @@ class ExpenseListScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Add expense feature coming soon!')),
+            const SnackBar(content: Text('Add expense feature coming soon!')),
           );
         },
         backgroundColor: Colors.blue,
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -185,67 +136,5 @@ class ExpenseListScreen extends StatelessWidget {
   String _calculateTotal(List<Expense> expenses) {
     double total = expenses.fold(0, (sum, expense) => sum + expense.amount);
     return 'Rp ${total.toStringAsFixed(0)}';
-  }
-
-  Color _getCategoryColor(String category) {
-    switch (category.toLowerCase()) {
-      case 'food':
-        return Colors.orange;
-      case 'transportation':
-        return Colors.green;
-      case 'utilities':
-        return Colors.purple;
-      case 'entertainment':
-        return Colors.pink;
-      case 'education':
-        return Colors.blue;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  IconData _getCategoryIcon(String category) {
-    switch (category.toLowerCase()) {
-      case 'food':
-        return Icons.restaurant;
-      case 'transportation':
-        return Icons.directions_car;
-      case 'utilities':
-        return Icons.home;
-      case 'entertainment':
-        return Icons.movie;
-      case 'education':
-        return Icons.school;
-      default:
-        return Icons.attach_money;
-    }
-  }
-
-  void _showExpenseDetails(BuildContext context, Expense expense) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(expense.title),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Amount: ${expense.formattedAmount}'),
-            SizedBox(height: 8),
-            Text('Category: ${expense.category}'),
-            SizedBox(height: 8),
-            Text('Date: ${expense.formattedDate}'),
-            SizedBox(height: 8),
-            Text('Description: ${expense.description}'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Close'),
-          ),
-        ],
-      ),
-    );
   }
 }

@@ -1,118 +1,134 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
+import '../models/user.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _fullnameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  final List<User> _registeredUsers = [];
+
+  void _register() {
+    if (_formKey.currentState!.validate()) {
+      // Check if username or email already exists
+      if (_registeredUsers.any((user) => user.username == _usernameController.text)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Username already exists')),
+        );
+        return;
+      }
+      if (_registeredUsers.any((user) => user.email == _emailController.text)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Email already exists')),
+        );
+        return;
+      }
+
+      final newUser = User(
+        fullname: _fullnameController.text,
+        email: _emailController.text,
+        username: _usernameController.text,
+        password: _passwordController.text,
+      );
+      _registeredUsers.add(newUser);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Registration successful!')),
+      );
+      Navigator.pop(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Register'), backgroundColor: Colors.blue),
+      appBar: AppBar(
+        title: const Text('Register'),
+      ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Logo
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.person_add, size: 50, color: Colors.white),
-            ),
-            SizedBox(height: 32),
-
-            // Full Name Field
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Full Name',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person),
-              ),
-            ),
-            SizedBox(height: 16),
-
-            // Email Field
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.email),
-              ),
-            ),
-            SizedBox(height: 16),
-
-            // Username Field
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Username',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.account_circle),
-              ),
-            ),
-            SizedBox(height: 16),
-
-            // Password Field
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.lock),
-              ),
-            ),
-            SizedBox(height: 16),
-
-            // Confirm Password Field
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Confirm Password',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.lock_outline),
-              ),
-            ),
-            SizedBox(height: 24),
-
-            // Register Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                  );
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              TextFormField(
+                controller: _fullnameController,
+                decoration: const InputDecoration(labelText: 'Full Name'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your full name';
+                  }
+                  return null;
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: Text(
-                  'REGISTER',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
               ),
-            ),
-            SizedBox(height: 16),
-
-            // Login Link
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("Already have an account? "),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('Login'),
-                ),
-              ],
-            ),
-          ],
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter an email';
+                  }
+                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                    return 'Please enter a valid email';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _usernameController,
+                decoration: const InputDecoration(labelText: 'Username'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a username';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _passwordController,
+                decoration: const InputDecoration(labelText: 'Password'),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a password';
+                  }
+                  if (value.length < 6) {
+                    return 'Password must be at least 6 characters long';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _confirmPasswordController,
+                decoration: const InputDecoration(labelText: 'Confirm Password'),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please confirm your password';
+                  }
+                  if (value != _passwordController.text) {
+                    return 'Passwords do not match';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _register,
+                child: const Text('Register'),
+              ),
+            ],
+          ),
         ),
       ),
     );
