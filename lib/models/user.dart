@@ -11,3 +11,12 @@ class User {
     required this.password,
   });
 }
+
+final List<User> userList = [
+  User(
+    fullname: 'User One',
+    email: 'user1@example.com',
+    username: 'user1',
+    password: 'password1',
+  ),
+];

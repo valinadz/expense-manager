@@ -6,7 +6,7 @@ import 'home_screen.dart';
 
 // A mock user list for demonstration purposes.
 // In a real app, this would come from a database or API.
-final List<User> _registeredUsers = [];
+// final List<User> _registeredUsers = [];
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -28,7 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // Find user by username or email
       User? user;
       try {
-        user = _registeredUsers.firstWhere(
+        user = userList.firstWhere(
           (user) =>
               (user.username == identifier || user.email == identifier) &&
               user.password == password,
@@ -46,9 +46,9 @@ class _LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid credentials')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Invalid credentials')));
       }
     }
   }
@@ -115,7 +115,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: const Text(
                     'LOGIN',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -128,7 +132,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterScreen(),
+                        ),
                       ).then((_) {
                         // This is a simple way to get the users from the register screen.
                         // A better approach would be to use a state management solution.

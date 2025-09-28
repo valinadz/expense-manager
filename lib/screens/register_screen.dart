@@ -16,21 +16,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  final List<User> _registeredUsers = [];
-
   void _register() {
     if (_formKey.currentState!.validate()) {
       // Check if username or email already exists
-      if (_registeredUsers.any((user) => user.username == _usernameController.text)) {
+      if (userList.any((user) => user.username == _usernameController.text)) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Username already exists')),
         );
         return;
       }
-      if (_registeredUsers.any((user) => user.email == _emailController.text)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Email already exists')),
-        );
+      if (userList.any((user) => user.email == _emailController.text)) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Email already exists')));
         return;
       }
 
@@ -40,11 +38,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         username: _usernameController.text,
         password: _passwordController.text,
       );
-      _registeredUsers.add(newUser);
+      userList.add(newUser);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration successful!')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Registration successful!')));
       Navigator.pop(context);
     }
   }
@@ -52,9 +50,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Register'),
-      ),
+      appBar: AppBar(title: const Text('Register')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -110,7 +106,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               TextFormField(
                 controller: _confirmPasswordController,
-                decoration: const InputDecoration(labelText: 'Confirm Password'),
+                decoration: const InputDecoration(
+                  labelText: 'Confirm Password',
+                ),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
