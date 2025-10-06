@@ -4,7 +4,7 @@ class Expense {
   final double amount;
   final String category;
   final DateTime date;
-  final String description;
+  String? description;
 
   Expense({
     required this.id,
@@ -12,7 +12,7 @@ class Expense {
     required this.amount,
     required this.category,
     required this.date,
-    required this.description,
+    this.description,
   });
 
   String get formattedAmount => 'Rp ${amount.toStringAsFixed(0)}';
@@ -88,3 +88,24 @@ final List<Expense> expenses = [
     description: 'Daily commute to office',
   ),
 ];
+
+void createExpense(Expense newExpense) {
+  expenses.add(newExpense);
+}
+
+List<Expense> getExpenses() {
+  return expenses;
+}
+
+void updateExpense(Expense updatedExpense) {
+  final index = expenses.indexWhere(
+    (expense) => expense.id == updatedExpense.id,
+  );
+  if (index != -1) {
+    expenses[index] = updatedExpense;
+  }
+}
+
+void deleteExpense(String expenseId) {
+  expenses.removeWhere((expense) => expense.id == expenseId);
+}

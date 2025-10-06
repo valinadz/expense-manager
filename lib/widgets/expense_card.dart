@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:pemrograman_mobile/screens/manage_expense_screen.dart';
 import '../models/expense.dart';
 
 class ExpenseCard extends StatelessWidget {
   final Expense expense;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
-  const ExpenseCard({super.key, required this.expense});
+  const ExpenseCard({
+    super.key,
+    required this.expense,
+    required this.onEdit,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +124,20 @@ class ExpenseCard extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Close'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              onEdit();
+            },
+            child: const Text('Edit'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              onDelete();
+            },
+            child: const Text('Delete'),
           ),
         ],
       ),

@@ -1,9 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:pemrograman_mobile/screens/manage_expense_screen.dart';
 import '../models/expense.dart';
 import '../widgets/expense_card.dart';
 
-class ExpenseListScreen extends StatelessWidget {
+class ExpenseListScreen extends StatefulWidget {
   const ExpenseListScreen({super.key});
+
+  @override
+  State<ExpenseListScreen> createState() => _ExpenseListScreenState();
+}
+
+class _ExpenseListScreenState extends State<ExpenseListScreen> {
+  late List<Expense> _expenses;
+
+  @override
+  void initState() {
+    super.initState();
+    _expenses = getExpenses();
+  }
+
+  void _navigateAndRefresh() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ManageExpenseScreen()),
+    );
+    setState(() {
+      _expenses = getExpenses();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +52,7 @@ class ExpenseListScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
                 Text(
-                  _calculateTotal(expenses),
+                  _calculateTotal(_expenses),
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -41,20 +65,36 @@ class ExpenseListScreen extends StatelessWidget {
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(8),
-              itemCount: expenses.length,
+              itemCount: _expenses.length,
               itemBuilder: (context, index) {
-                return ExpenseCard(expense: expenses[index]);
+                final expense = _expenses[index];
+                return ExpenseCard(
+                  expense: expense,
+                  onEdit: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ManageExpenseScreen(expense: expense),
+                      ),
+                    );
+                    setState(() {
+                      _expenses = getExpenses();
+                    });
+                  },
+                  onDelete: () {
+                    deleteExpense(expense.id);
+                    setState(() {
+                      _expenses = getExpenses();
+                    });
+                  },
+                );
               },
             ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Add expense feature coming soon!')),
-          );
-        },
+        onPressed: _navigateAndRefresh,
         backgroundColor: Colors.blue,
         child: const Icon(Icons.add),
       ),
