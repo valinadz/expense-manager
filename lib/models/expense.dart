@@ -5,6 +5,7 @@ class Expense {
   final String category;
   final DateTime date;
   String? description;
+  String? imagePath;
 
   Expense({
     required this.id,
@@ -13,6 +14,7 @@ class Expense {
     required this.category,
     required this.date,
     this.description,
+    this.imagePath,
   });
 
   String get formattedAmount => 'Rp ${amount.toStringAsFixed(0)}';

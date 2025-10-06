@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:pemrograman_mobile/models/expense.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ManageExpenseScreen extends StatefulWidget {
   final Expense? expense;
@@ -18,6 +22,7 @@ class _ManageExpenseScreenState extends State<ManageExpenseScreen> {
   late String _category;
   late DateTime _date;
   late String _description;
+  File? _image;
 
   final List<String> _categories = [
     'Food',
@@ -37,12 +42,63 @@ class _ManageExpenseScreenState extends State<ManageExpenseScreen> {
       _category = widget.expense!.category;
       _date = widget.expense!.date;
       _description = widget.expense!.description!;
+      if (widget.expense!.imagePath != null) {
+        _image = File(widget.expense!.imagePath!);
+      }
     } else {
       _title = '';
       _amount = 0;
       _category = _categories.first;
       _date = DateTime.now();
       _description = '';
+    }
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final permission = source == ImageSource.camera ? Permission.camera : Permission.photos;
+    final status = await permission.status;
+
+    if (status.isDenied) {
+      // Show a dialog to explain why we need the permission
+      final result = await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Permission needed'),
+          content: Text(
+              'This app needs access to your ${source == ImageSource.camera ? 'camera' : 'photos'} to add a receipt image.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+
+      if (result != true) {
+        return;
+      }
+    }
+
+    final newStatus = await permission.request();
+
+    if (newStatus.isGranted) {
+      final pickedFile = await ImagePicker().pickImage(source: source);
+
+      if (pickedFile != null) {
+        setState(() {
+          _image = File(pickedFile.path);
+        });
+      }
+    } else {
+      // Handle the case when permission is denied
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Permission denied')),
+      );
     }
   }
 
@@ -56,6 +112,7 @@ class _ManageExpenseScreenState extends State<ManageExpenseScreen> {
         category: _category,
         date: _date,
         description: _description,
+        imagePath: _image?.path,
       );
       if (widget.expense == null) {
         createExpense(newExpense);
@@ -155,6 +212,27 @@ class _ManageExpenseScreenState extends State<ManageExpenseScreen> {
                       }
                     },
                     child: const Text('Choose Date'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              if (_image != null)
+                Image.file(
+                  _image!,
+                  height: 150,
+                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () => _pickImage(ImageSource.camera),
+                    icon: const Icon(Icons.camera),
+                    label: const Text('Camera'),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () => _pickImage(ImageSource.gallery),
+                    icon: const Icon(Icons.image),
+                    label: const Text('Gallery'),
                   ),
                 ],
               ),

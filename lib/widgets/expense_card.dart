@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:pemrograman_mobile/screens/manage_expense_screen.dart';
 import '../models/expense.dart';
@@ -111,6 +113,11 @@ class ExpenseCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (expense.imagePath != null)
+              Image.file(
+                File(expense.imagePath!),
+                height: 150,
+              ),
             Text('Amount: ${expense.formattedAmount}'),
             const SizedBox(height: 8),
             Text('Category: ${expense.category}'),
