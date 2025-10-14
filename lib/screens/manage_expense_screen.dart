@@ -41,7 +41,7 @@ class _ManageExpenseScreenState extends State<ManageExpenseScreen> {
       _amount = widget.expense!.amount;
       _category = widget.expense!.category;
       _date = widget.expense!.date;
-      _description = widget.expense!.description!;
+      _description = widget.expense!.description ?? '';
       if (widget.expense!.imagePath != null) {
         _image = File(widget.expense!.imagePath!);
       }
@@ -55,38 +55,42 @@ class _ManageExpenseScreenState extends State<ManageExpenseScreen> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
-    final permission = source == ImageSource.camera ? Permission.camera : Permission.photos;
-    final status = await permission.status;
+    final permission =
+        source == ImageSource.camera ? Permission.camera : Permission.photos;
+    final status = await permission.request();
 
-    if (status.isDenied) {
+    if (!status.isGranted) {
       // Show a dialog to explain why we need the permission
       final result = await showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Permission needed'),
-          content: Text(
-              'This app needs access to your ${source == ImageSource.camera ? 'camera' : 'photos'} to add a receipt image.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
+        builder:
+            (context) => AlertDialog(
+              title: const Text('Permission needed'),
+              content: Text(
+                'This app needs access to your ${source == ImageSource.camera ? 'camera' : 'photos'} to add a receipt image.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('OK'),
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
       );
 
       if (result != true) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Permission denied')));
         return;
       }
     }
 
-    final newStatus = await permission.request();
-
-    if (newStatus.isGranted) {
+    if (await permission.isGranted) {
       final pickedFile = await ImagePicker().pickImage(source: source);
 
       if (pickedFile != null) {
@@ -95,31 +99,39 @@ class _ManageExpenseScreenState extends State<ManageExpenseScreen> {
         });
       }
     } else {
-      // Handle the case when permission is denied
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Permission denied')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Permission denied')));
     }
   }
 
-  void _saveForm() {
+  Future<void> _saveForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      final newExpense = Expense(
-        id: widget.expense?.id ?? DateTime.now().toString(),
-        title: _title,
-        amount: _amount,
-        category: _category,
-        date: _date,
-        description: _description,
-        imagePath: _image?.path,
-      );
-      if (widget.expense == null) {
-        createExpense(newExpense);
-      } else {
-        updateExpense(newExpense);
+      try {
+        final newExpense = Expense(
+          id: widget.expense?.id ?? DateTime.now().toString(),
+          title: _title,
+          amount: _amount,
+          category: _category,
+          date: _date,
+          description: _description,
+          imagePath: _image?.path,
+        );
+        if (widget.expense == null) {
+          createExpense(newExpense);
+        } else {
+          updateExpense(newExpense);
+        }
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Expense saved successfully!')));
+        Navigator.of(context).pop();
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to save expense: $e')));
       }
-      Navigator.of(context).pop();
     }
   }
 
@@ -166,7 +178,7 @@ class _ManageExpenseScreenState extends State<ManageExpenseScreen> {
                 },
               ),
               DropdownButtonFormField<String>(
-                value: _category,
+                initialValue: _category,
                 decoration: const InputDecoration(labelText: 'Category'),
                 items:
                     _categories.map((String category) {
@@ -220,6 +232,8 @@ class _ManageExpenseScreenState extends State<ManageExpenseScreen> {
                 Image.file(
                   _image!,
                   height: 150,
+                  cacheWidth: 300,
+                  cacheHeight: 300,
                 ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -231,7 +245,6 @@ class _ManageExpenseScreenState extends State<ManageExpenseScreen> {
                   ),
                   ElevatedButton.icon(
                     onPressed: () => _pickImage(ImageSource.gallery),
-                    icon: const Icon(Icons.image),
                     label: const Text('Gallery'),
                   ),
                 ],

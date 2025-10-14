@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 
+// Ensures that widget binding is initialized before using plugins (e.g., SharedPreferences) in async main.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
@@ -22,7 +23,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: isLoggedIn ? const HomeScreen() : const LoginScreen(),
+      home: _getHomeScreen(),
     );
+  }
+
+  _getHomeScreen() {
+    return isLoggedIn ? const HomeScreen() : const LoginScreen();
   }
 }
