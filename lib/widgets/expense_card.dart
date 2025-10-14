@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:pemrograman_mobile/screens/manage_expense_screen.dart';
 import '../models/expense.dart';
 
 class ExpenseCard extends StatelessWidget {
@@ -32,26 +31,18 @@ class ExpenseCard extends StatelessWidget {
         ),
         title: Text(
           expense.title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w500),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               expense.category,
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 12,
-              ),
+              style: TextStyle(color: Colors.grey[600], fontSize: 12),
             ),
             Text(
               expense.formattedDate,
-              style: TextStyle(
-                color: Colors.grey[500],
-                fontSize: 11,
-              ),
+              style: TextStyle(color: Colors.grey[500], fontSize: 11),
             ),
           ],
         ),
@@ -107,47 +98,45 @@ class ExpenseCard extends StatelessWidget {
   void _showExpenseDetails(BuildContext context, Expense expense) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(expense.title),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (expense.imagePath != null)
-              Image.file(
-                File(expense.imagePath!),
-                height: 150,
+      builder:
+          (context) => AlertDialog(
+            title: Text(expense.title),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (expense.imagePath != null)
+                  Image.file(File(expense.imagePath!), height: 150),
+                Text('Amount: ${expense.formattedAmount}'),
+                const SizedBox(height: 8),
+                Text('Category: ${expense.category}'),
+                const SizedBox(height: 8),
+                Text('Date: ${expense.formattedDate}'),
+                const SizedBox(height: 8),
+                Text('Description: ${expense.description}'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
               ),
-            Text('Amount: ${expense.formattedAmount}'),
-            const SizedBox(height: 8),
-            Text('Category: ${expense.category}'),
-            const SizedBox(height: 8),
-            Text('Date: ${expense.formattedDate}'),
-            const SizedBox(height: 8),
-            Text('Description: ${expense.description}'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  onEdit();
+                },
+                child: const Text('Edit'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  onDelete();
+                },
+                child: const Text('Delete'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              onEdit();
-            },
-            child: const Text('Edit'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              onDelete();
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
     );
   }
 }
