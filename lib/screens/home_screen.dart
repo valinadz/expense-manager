@@ -1,139 +1,130 @@
 import 'package:flutter/material.dart';
+import '../models/product.dart';
+import 'product_detail_screen.dart';
+import 'cart_screen.dart';
+import 'login_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final List<Product> cart = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF3E5F5),
       appBar: AppBar(
-        title: Text('Home'),
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color(0xFF7B1FA2),
+        elevation: 0,
+        title: const Text("SweetBite Bakery"),
         actions: [
           IconButton(
+            icon: const Icon(Icons.shopping_cart_outlined),
             onPressed: () {
-              // Handle logout
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => CartScreen(cartItems: cart)),
+              );
             },
-            icon: Icon(Icons.logout),
           ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+              );
+            },
+          )
         ],
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.white,
-                    child: Icon(Icons.person, size: 40, color: Colors.blue),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Welcome User!',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: GridView.builder(
+          itemCount: productList.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 0.75,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+          ),
+          itemBuilder: (context, index) {
+            final product = productList[index];
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProductDetailScreen(
+                      product: product,
+                      onAddToCart: (p) {
+                        setState(() => cart.add(p));
+                      },
                     ),
                   ),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Home'),
-              onTap: () {
-                Navigator.pop(context);
+                );
               },
-            ),
-            ListTile(
-              leading: Icon(Icons.person),
-              title: Text('Profile'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            Divider(),
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Logout'),
-              onTap: () {
-                // Handle logout
-              },
-            ),
-          ],
-        ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Dashboard',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue,
-              ),
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                children: [
-                  _buildDashboardCard('Profile', Icons.person, Colors.green),
-                  _buildDashboardCard('Messages', Icons.message, Colors.orange),
-                  _buildDashboardCard('Settings', Icons.settings, Colors.purple),
-                  _buildDashboardCard('Help', Icons.help, Colors.red),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDashboardCard(String title, IconData icon, Color color) {
-    return Card(
-      elevation: 4,
-      child: InkWell(
-        onTap: () {
-          // Handle card tap
-        },
-        child: Container(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 48, color: color),
-              SizedBox(height: 12),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+                color: Colors.white,
+                elevation: 4,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(16)),
+                      child: Image.network(
+                        product.imageUrl,
+                        height: 120,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        product.name,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Text(
+                        "Rp ${product.price.toStringAsFixed(0)}",
+                        style: const TextStyle(
+                            color: Color(0xFF7B1FA2),
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    const Spacer(),
+                    Center(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF7B1FA2),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: () {
+                          setState(() => cart.add(product));
+                        },
+                        child: const Text("Tambah"),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
                 ),
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

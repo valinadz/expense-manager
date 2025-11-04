@@ -1,114 +1,132 @@
 import 'package:flutter/material.dart';
+import 'login_screen.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  final _formKey = GlobalKey<FormState>();
+  bool _isPasswordVisible = false;
+  bool _isConfirmVisible = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Register'), backgroundColor: Colors.blue),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Logo
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.person_add, size: 50, color: Colors.white),
-            ),
-            SizedBox(height: 32),
-
-            // Full Name Field
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Full Name',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person),
-              ),
-            ),
-            SizedBox(height: 16),
-
-            // Email Field
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.email),
-              ),
-            ),
-            SizedBox(height: 16),
-
-            // Username Field
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Username',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.account_circle),
-              ),
-            ),
-            SizedBox(height: 16),
-
-            // Password Field
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.lock),
-              ),
-            ),
-            SizedBox(height: 16),
-
-            // Confirm Password Field
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Confirm Password',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.lock_outline),
-              ),
-            ),
-            SizedBox(height: 24),
-
-            // Register Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  // Handle register
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: EdgeInsets.symmetric(vertical: 16),
+      backgroundColor: const Color(0xFFF3E5F5),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            elevation: 8,
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    const Icon(Icons.cookie, color: Color(0xFF7B1FA2), size: 72),
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Buat Akun Baru",
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF7B1FA2)),
+                    ),
+                    const SizedBox(height: 24),
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: "Nama Lengkap",
+                        prefixIcon: Icon(Icons.person_outline),
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: "Email",
+                        prefixIcon: Icon(Icons.email_outlined),
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      obscureText: !_isPasswordVisible,
+                      decoration: InputDecoration(
+                        labelText: "Password",
+                        prefixIcon: const Icon(Icons.lock_outline),
+                        border: const OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(_isPasswordVisible
+                              ? Icons.visibility_off
+                              : Icons.visibility),
+                          onPressed: () => setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          }),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      obscureText: !_isConfirmVisible,
+                      decoration: InputDecoration(
+                        labelText: "Konfirmasi Password",
+                        prefixIcon: const Icon(Icons.lock),
+                        border: const OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(_isConfirmVisible
+                              ? Icons.visibility_off
+                              : Icons.visibility),
+                          onPressed: () => setState(() {
+                            _isConfirmVisible = !_isConfirmVisible;
+                          }),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF7B1FA2),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(14.0),
+                          child: Text(
+                            "Daftar",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Sudah punya akun? Login di sini",
+                        style: TextStyle(color: Color(0xFF7B1FA2)),
+                      ),
+                    )
+                  ],
                 ),
-                child: Text(
-                  'REGISTER',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
               ),
             ),
-            SizedBox(height: 16),
-
-            // Login Link
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("Already have an account? "),
-                TextButton(
-                  onPressed: () {
-                    // Navigate to login
-                  },
-                  child: Text('Login'),
-                ),
-              ],
-            ),
-          ],
+          ),
         ),
       ),
     );
